@@ -1,3 +1,11 @@
+# 前言
+此前， [LLMs-from-scratch-CN](https://github.com/MLNLP-World/LLMs-from-scratch-CN) 对 [LLMs-from-scratch](https://github.com/rasbt/LLMs-from-scratch.git) 的翻译工作，让我受益匪浅。虽然英语技术文章阅读难度不大，但是中文能提供更直觉、更系统的思维和清晰的知识结构。这个翻译工作帮助我快速了解掌握了一些大模型的实现细节。
+
+近日，原作者 Sebastian Raschka 博士开启了新项目 [reasoning-from-scratch](https://github.com/rasbt/reasoning-from-scratch.git)，旨在从零开始解析大语言模型的推理机制。为追踪此技术前沿，我决定尝试独自进行该系列内容的同步翻译工作，并在一些需要解释验证的地方增加注解。翻译工作纯属个人学习，旨在为中文社区提供一份参考。疏漏之处，欢迎指正。
+
+这里收集了机器之心对Sebastian Raschka 博士的博客文章[first-look-at-reasoning-from-scratch](https://magazine.sebastianraschka.com/p/first-look-at-reasoning-from-scratch) 的翻译 [从头开始推理](/Sebastian_Raschka_first-look-at-reasoning-from-scratch.md)，以供参考。
+
+
 # 从零构建推理模型（Build A Reasoning Model From Scratch）
 
 本仓库包含开发 LLM 推理模型（reasoning model）的代码，是 [*Build a Reasoning Model (From Scratch)*](https://mng.bz/lZ5B) 一书的官方代码仓库。

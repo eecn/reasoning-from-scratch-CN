@@ -1,7 +1,7 @@
-# Chapter 5: Inference-Time Scaling via Self-Refinement
+# 第 5 章：通过自我精炼进行推理时扩展
 
 &nbsp;
-## Main chapter code
+## 主要章节代码
 
-- [ch05_main.ipynb](ch05_main.ipynb): main chapter code
-- [ch05_exercise-solutions.ipynb](ch05_exercise-solutions.ipynb): exercise solutions
+- [ch05_main.ipynb](ch05_main.ipynb)：主要章节代码
+- [ch05_exercise-solutions.ipynb](ch05_exercise-solutions.ipynb)：练习题解答

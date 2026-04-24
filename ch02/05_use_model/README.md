@@ -1,4 +1,4 @@
-# Run Inference and Chat With the Model
+# 运行推理并与模型对话
 
 &nbsp;
 
@@ -6,20 +6,20 @@
 
 &nbsp;
 
-This folder contains standalone example scripts to generate text with the model we loaded in chapter 2 (and exercises):
+此文件夹包含独立的示例脚本，用于使用我们在第 2 章（及练习）中加载的模型生成文本：
 
-- `generate_simple.py`: Generates text similar to the main chapter.
-- `chat.py`: Similar to the code above, as an interactive wrapper so that we can prompt the model multiple times without having to reload the model into memory each time.
-- `chat_multiturn.py`: Same as above, but with a memory feature to remember the message history.
+- `generate_simple.py`：以类似主要章节的方式生成文本。
+- `chat.py`：与上面的代码类似，作为交互式封装，这样我们可以多次向模型发送 prompt，而无需每次都重新加载模型到内存中。
+- `chat_multiturn.py`：与上面相同，但增加了记忆功能以记住消息历史。
 
 
 
-More usage details are provided in the sections below.
+更多使用细节在下面的章节中提供。
 
 &nbsp;
 ## generate_simple.py
 
-This simple function loads the model as described in chapter 2 and uses the `generate_text_simple_cache_stream` function from the chapter 2 exercises. You can use the function as follows (replace `uv run` with `python` if you are not using `uv`):
+这个简单的函数按照第 2 章的方式加载模型，并使用第 2 章练习中的 `generate_text_simple_cache_stream` 函数。你可以按如下方式使用（如果你不使用 `uv`，请将 `uv run` 替换为 `python`）：
 
 ```bash
 uv run ch02/05_use_model/generate_simple.py
@@ -40,7 +40,7 @@ Time: 1.52 sec
 22 tokens/sec
 ```
 
-The function is useful if you want to quickly try out different prompts with the base or reasoning variant. The additional options are listed below:
+如果你想用基座模型或推理变体快速尝试不同的 prompt，这个函数很有用。额外选项如下所列：
 
 ```bash
 usage: generate_simple.py [-h] [--device DEVICE]
@@ -68,9 +68,9 @@ options:
 &nbsp;
 ## chat.py
 
-Similar to the function above, this function is useful to try different prompts on the base and reasoning models. 
+与上面的函数类似，此函数适用于在基座模型和推理模型上尝试不同的 prompt。
 
-However, in contrast to the previous function, this function keeps the user in an interactive mode so that the model doesn't have to be reloaded each time:
+不过，与前一个函数不同的是，此函数保持用户在交互模式中，这样每次都不必重新加载模型：
 
 ```bash
 uv run ch02/05_use_model/chat.py        
@@ -117,7 +117,7 @@ Time: 1.04 sec
 ------------------------------------------------------------
 ```
 
-Additional options are listed below:
+额外选项如下所列：
 
 ```bash
 usage: chat.py [-h] [--device DEVICE] [--max_new_tokens MAX_NEW_TOKENS] [--compile]
@@ -141,7 +141,7 @@ options:
 
 ## chat_multiturn.py
 
-This function is similar to the one above, except it adds a multi-turn memory so that the LLM remembers the conversation from the past turns. It is highly recommended to use the reasoning variant here as the base model struggles with conversations:
+此函数与上面类似，但增加了多轮记忆功能，使 LLM 能够记住之前轮次的对话。强烈建议在此使用推理变体，因为基座模型在对话中表现不佳：
 
 
 
@@ -204,7 +204,7 @@ Time: 5.21 sec
 
 
 
-Additional options are listed below:
+额外选项如下所列：
 
 ```bash
 usage: chat_multiturn.py [-h] [--device DEVICE] [--max_new_tokens MAX_NEW_TOKENS]

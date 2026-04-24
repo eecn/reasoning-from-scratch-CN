@@ -1,11 +1,11 @@
-# Chapter 5: Inference-Time Scaling via Self-Refinement
+# 第 5 章：通过自我精炼进行推理时扩展
 
 &nbsp;
-## Main chapter code
+## 主要章节代码
 
-- [01_main-chapter-code](01_main-chapter-code): main chapter code and exercise solutions
+- [01_main-chapter-code](01_main-chapter-code)：主要章节代码和练习题解答
 
 &nbsp;
-## Bonus material
+## 附加材料
 
-- [02_math500-more-inference-scaling-scripts](02_math500-more-inference-scaling-scripts): optional Python scripts to apply the inference scaling techniques covered in this chapter (Best-of-N and self-refinement) to the MATH-500 evaluation from the previous chapter.
+- [02_math500-more-inference-scaling-scripts](02_math500-more-inference-scaling-scripts)：可选的 Python 脚本，用于将本章涵盖的推理时扩展技术（Best-of-N 和自我精炼）应用于上一章的 MATH-500 评估。

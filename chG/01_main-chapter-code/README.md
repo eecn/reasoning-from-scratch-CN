@@ -1,27 +1,27 @@
-# Appendix G: Building a Chat Interface
+# 附录 G：构建聊天界面
 
 
 
-This folder contains code for running a ChatGPT-like user interface to interact with the LLMs used and/or developed in this book, as shown below.
+此文件夹包含用于运行类 ChatGPT 用户界面的代码，可用于与本书中使用和/或开发的 LLM 进行交互，如下所示。
 
 
 
-![Chainlit UI example](https://sebastianraschka.com/images/LLMs-from-scratch-images/bonus/qwen/qwen3-chainlit.gif)
+![Chainlit UI 示例](https://sebastianraschka.com/images/LLMs-from-scratch-images/bonus/qwen/qwen3-chainlit.gif)
 
 
 
-To implement this user interface, we use the open-source [Chainlit Python package](https://github.com/Chainlit/chainlit).
+为了实现此用户界面，我们使用开源的 [Chainlit Python 包](https://github.com/Chainlit/chainlit)。
 
 &nbsp;
-## Step 1: Install dependencies
+## 第 1 步：安装依赖
 
-First, we install the `chainlit` package and dependency:
+首先，安装 `chainlit` 包和依赖项：
 
 ```bash
 pip install chainlit
 ```
 
-Or, if you are using `uv`:
+或者，如果你使用的是 `uv`：
 
 ```bash
 uv add chainlit
@@ -31,42 +31,42 @@ uv add chainlit
 
 &nbsp;
 
-## Step 2: Run `app` code
+## 第 2 步：运行 `app` 代码
 
-This folder contains 2 files:
+此文件夹包含 2 个文件：
 
-1. [`qwen3_chat_interface.py`](qwen3_chat_interface.py): This file loads and uses the Qwen3 0.6B model in thinking mode.
-2. [`qwen3_chat_interface_multiturn.py`](qwen3_chat_interface_multiturn.py): The same as above, but configured to remember the message history.
+1. [`qwen3_chat_interface.py`](qwen3_chat_interface.py)：此文件加载并使用 Qwen3 0.6B 模型的思考模式（thinking mode）。
+2. [`qwen3_chat_interface_multiturn.py`](qwen3_chat_interface_multiturn.py)：与上面相同，但配置为记住消息历史。
 
-(Open and inspect these files to learn more.)
+（打开并检查这些文件以了解更多信息。）
 
-Run one of the following commands from the terminal to start the UI server:
+从终端运行以下命令之一来启动 UI 服务器：
 
 ```bash
 chainlit run qwen3_chat_interface.py
 ```
 
-or, if you are using `uv`:
+或者，如果你使用的是 `uv`：
 
 ```bash
 uv run chainlit run qwen3_chat_interface.py
 ```
 
-Running one of the commands above should open a new browser tab where you can interact with the model. If the browser tab does not open automatically, inspect the terminal command and copy the local address into your browser address bar (usually, the address is `http://localhost:8000`).
+运行上述命令之一后，应该会打开一个新的浏览器标签页，你可以在其中与模型交互。如果浏览器标签页没有自动打开，请检查终端命令并将本地地址复制到浏览器地址栏中（通常地址为 `http://localhost:8000`）。
 
-## Using a custom checkpoint
+## 使用自定义检查点
 
-Since `chainlit run ...` owns the command-line arguments, these scripts read a custom checkpoint path from the `CHECKPOINT_PATH` environment variable instead of `argparse`.
+由于 `chainlit run ...` 占用了命令行参数，这些脚本从 `CHECKPOINT_PATH` 环境变量（而非 `argparse`）中读取自定义检查点路径。
 
-Terminal example:
+终端示例：
 
 ```bash
 CHECKPOINT_PATH=/absolute/path/to/qwen3-0.6B-distill-step06682-epoch1.pth \
 uv run chainlit run qwen3_chat_interface.py
 ```
 
-Notes:
+注意事项：
 
-- Keep `WHICH_MODEL` in the script aligned with the tokenizer the checkpoint expects.
-- The chapter 8 checkpoints from [`ch08/05_download_training_checkpoints`](../../ch08/05_download_training_checkpoints) use the reasoning tokenizer, so use `WHICH_MODEL = "reasoning"`.
-- When `CHECKPOINT_PATH` is set, the script only downloads the tokenizer into `LOCAL_DIR`; it does not re-download the default model weights.
+- 保持脚本中的 `WHICH_MODEL` 与检查点所期望的分词器（tokenizer）一致。
+- 来自 [`ch08/05_download_training_checkpoints`](../../ch08/05_download_training_checkpoints) 的第 8 章检查点使用推理分词器，因此请使用 `WHICH_MODEL = "reasoning"`。
+- 当设置了 `CHECKPOINT_PATH` 时，脚本只会将分词器下载到 `LOCAL_DIR`；它不会重新下载默认模型权重。

@@ -1,50 +1,49 @@
 
-# LLM-as-a-judge
+# LLM 作为评判者
 
-This bonus material implements an LLM-as-a-judge approach, where gpt-oss:20b (via the open-source Ollama library) evaluates Qwen3 0.6B base and reasoning variants on MATH-500.
+此附加材料实现了 LLM 作为评判者（LLM-as-a-judge）的方法，其中 gpt-oss:20b（通过开源的 Ollama 库）在 MATH-500 上评估 Qwen3 0.6B 的基座和推理变体。
 
 <img src="https://sebastianraschka.com/images/reasoning-from-scratch-images/appendix-f/Appendix_F_F06_raschka.webp" width="500px">
 
 
 
 
-
-- Ollama is an open-source application to run LLMs efficiently
-- It is a wrapper around llama.cpp ([https://github.com/ggerganov/llama.cpp](https://github.com/ggerganov/llama.cpp)), which implements LLMs in pure C/C++ to maximize efficiency
-- Note that it is a to ol for using LLMs to generate text (inference), not training or finetuning LLMs
-- Before running the code below, install ollama by visiting [https://ollama.com](https://ollama.com) and following the instructions (for instance, clicking on the "Download" button and downloading the ollama application for your operating system)
-- For macOS and Windows users, click on the ollama application you downloaded; if it prompts you to install the command line usage, say "yes"
-- Linux users can use the installation command provided on the ollama website
-- There are 3 ways we can run ollama on our computer:
+- Ollama 是一个用于高效运行 LLM 的开源应用
+- 它是 llama.cpp（[https://github.com/ggerganov/llama.cpp](https://github.com/ggerganov/llama.cpp)）的封装，后者用纯 C/C++ 实现 LLM 以最大化效率
+- 注意它是一个用于使用 LLM 生成文本（推理）的工具，而非用于训练或微调 LLM
+- 在运行以下代码之前，请访问 [https://ollama.com](https://ollama.com) 安装 ollama 并按照说明操作（例如，点击 "Download" 按钮下载适用于你操作系统的 ollama 应用）
+- macOS 和 Windows 用户请点击下载的 ollama 应用；如果它提示你安装命令行使用，请选择 "yes"
+- Linux 用户可以使用 ollama 网站上提供的安装命令
+- 我们可以通过 3 种方式在计算机上运行 ollama：
 
 
 
 **1. `ollama serve`**
 
-- This runs the ollama backend as a server, usually on `http://localhost:11434`. It doesn't load a model until we call it through the API. This is what we want if we want to use ollama through Python.
+- 这会将 ollama 后端作为服务器运行，通常在 `http://localhost:11434`。在我们通过 API 调用之前，它不会加载模型。如果我们想通过 Python 使用 ollama，这就是我们需要的。
 
 **2. `ollama run gpt-oss:20b`**
 
-- This is a convenience wrapper. If the server is not already running, it will start it, then download the model (the first time), and drop us into an interactive terminal where we can chat with the model. Behind the scenes, it uses the same server API.
+- 这是一个便捷封装。如果服务器尚未运行，它会启动服务器，然后下载模型（首次运行时），并进入一个交互式终端，我们可以在其中与模型对话。在底层，它使用相同的服务器 API。
 
-**3. Ollama desktop app**
+**3. Ollama 桌面应用**
 
-- This runs the same backend automatically and provides a GUI on top of it (as shown in the figure above).
-It also applies defaults (system prompt, temperature, stop sequences), which can explain why answers look different from raw API usage.
-
-
-
-## Usage
+- 这会自动运行相同的后端，并在其上提供 GUI（如上图所示）。
+它还会应用默认设置（系统 prompt、temperature、停止序列），这可以解释为什么回答看起来与原始 API 使用不同。
 
 
 
-The options and defaults are shown below. 
+## 使用方法
+
+
+
+选项和默认值如下所示。
 
 <br>
 
 ---
 
-**Note**: If you are not a `uv` user, replace `uv run ...py` with `python ...py` in the examples below.
+**注意**：如果你不是 `uv` 用户，请在下面的示例中将 `uv run ...py` 替换为 `python ...py`。
 
 ---
 
@@ -87,7 +86,7 @@ options:
 
 
 
-**Base model**
+**基座模型**
 
 ```bash
 ➜  uv run ollama-judge.py
@@ -114,7 +113,7 @@ Average score: 3.800 over 10 example(s)
 Counts: 1:2 2:0 3:2 4:0 5:6
 ```
 
-**Reasoning model**
+**推理模型**
 
 ```bash
 ➜  uv run ollama-judge.py --which_model reasoning

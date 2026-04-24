@@ -1,52 +1,52 @@
-# Chapter 8 Bonus Material: Use Qwen3 From-Scratch Code via Hugging Face Transformers
+# 第 8 章附加材料：通过 Hugging Face Transformers 使用从零实现的 Qwen3 代码
 
-This folder shows how to convert the scratch [`Qwen3Model`](../../../reasoning_from_scratch/qwen3.py) and any compatible `.pth` checkpoint created via chapters 6-8 into a Hugging Face Transformers-compatible folder, and how to run it with Hugging Face inference functions and the `Trainer`.
+此文件夹展示了如何将从零实现的 [`Qwen3Model`](../../../reasoning_from_scratch/qwen3.py) 和通过第 6-8 章创建的任何兼容 `.pth` 检查点转换为 Hugging Face Transformers 兼容的文件夹，以及如何使用 Hugging Face 推理函数和 `Trainer` 运行它。
 
-The export is implemented as a custom `transformers` architecture, so it works with the standard Hugging Face APIs such as `AutoConfig`, `AutoTokenizer`, `AutoModelForCausalLM`, `model.generate(...)`, and `Trainer`. But because it is custom code, load it with `trust_remote_code=True`.
+导出实现为自定义 `transformers` 架构，因此可以与标准 Hugging Face API 配合使用，如 `AutoConfig`、`AutoTokenizer`、`AutoModelForCausalLM`、`model.generate(...)` 和 `Trainer`。但因为是自定义代码，加载时需要使用 `trust_remote_code=True`。
 
 &nbsp;
-## Files
+## 文件
 
-- [hf_export.py](hf_export.py): converts the scratch Qwen3 weights or a saved `.pth` checkpoint into a Hugging Face model folder
-- [hf_inference.py](hf_inference.py): runs text generation with `AutoModelForCausalLM`
-- [hf_trainer.py](hf_trainer.py): continues training an exported model with `transformers.Trainer` on the chapter 8 distillation JSON format
-- [hf_qwen3.py](hf_qwen3.py): custom Hugging Face `PretrainedConfig` and `PreTrainedModel` implementation for the exported Qwen3 architecture
+- [hf_export.py](hf_export.py)：将从零实现的 Qwen3 权重或已保存的 `.pth` 检查点转换为 Hugging Face 模型文件夹
+- [hf_inference.py](hf_inference.py)：使用 `AutoModelForCausalLM` 运行文本生成
+- [hf_trainer.py](hf_trainer.py)：使用 `transformers.Trainer` 在第 8 章蒸馏 JSON 格式上继续训练导出的模型
+- [hf_qwen3.py](hf_qwen3.py)：导出的 Qwen3 架构的自定义 Hugging Face `PretrainedConfig` 和 `PreTrainedModel` 实现
 
-The export scripts keep the Hugging Face-specific model code locally in this folder and import shared utilities from the [`reasoning_from_scratch`](../../../reasoning_from_scratch) package for the chapter 3 prompt template, RoPE helpers, and Qwen3 download functions. (See [chapter 2 setup instructions](../../../ch02/02_setup-tips/python-instructions.md) for installation details.)
+导出脚本将 Hugging Face 特定的模型代码保留在此文件夹本地，并从 [`reasoning_from_scratch`](../../../reasoning_from_scratch) 包导入共享工具函数，用于第 3 章 prompt 模板、RoPE 辅助函数和 Qwen3 下载函数。（安装详情请参阅[第 2 章设置说明](../../../ch02/02_setup-tips/python-instructions.md)。）
 
 ---
 
-**Note**: If you are not a `uv` user, replace `uv run ...py` with `python ...py` in the examples below.
+**注意**：如果你不是 `uv` 用户，请在下面的示例中将 `uv run ...py` 替换为 `python ...py`。
 
 ---
 
 &nbsp;
-## Step 1: Install dependencies
+## 步骤 1：安装依赖
 
-This guide uses Hugging Face Transformers in addition to the repository dependencies. For `transformers.Trainer`, you also need `accelerate`.
+本指南除了仓库依赖外还使用 Hugging Face Transformers。对于 `transformers.Trainer`，你还需要 `accelerate`。
 
 ```bash
 pip install transformers accelerate
 ```
 
-Or, if you are using `uv`:
+或者，如果你使用 `uv`：
 
 ```bash
 uv add --dev transformers accelerate
 ```
 
 &nbsp;
-## Step 2: Export the vanilla Qwen3 model
+## 步骤 2：导出原始 Qwen3 模型
 
-To export the original base model as a Hugging Face folder, run:
+要将原始基座模型导出为 Hugging Face 文件夹，运行：
 
 ```bash
 uv run hf_export.py \
   --output_dir hf-qwen3-base \
-  --tokenizer_kind "base"  # or use "reasoning"
+  --tokenizer_kind "base"  # 或使用 "reasoning"
 ```
 
-If you already have the raw `.pth` model and tokenizer locally, you can avoid a download:
+如果你已经在本地有原始 `.pth` 模型和 tokenizer，可以避免下载：
 
 ```bash
 uv run hf_export.py \
@@ -56,45 +56,45 @@ uv run hf_export.py \
   --tokenizer_path ../../../ch02/01_main-chapter-code/qwen3/tokenizer-base.json
 ```
 
-The same also works with the chapter 6-8 checkpoint `.pth` files.
+第 6-8 章检查点的 `.pth` 文件也同样适用。
 
-The exported folder will contain:
+导出的文件夹将包含：
 
 - `config.json`
 - `generation_config.json`
-- tokenizer files
-- model weights (by default as `model.safetensors`)
-- a copied custom Python module required by `trust_remote_code=True`
+- tokenizer 文件
+- 模型权重（默认为 `model.safetensors`）
+- `trust_remote_code=True` 所需的自定义 Python 模块副本
 
 &nbsp;
-### What the export code does
+### 导出代码做了什么
 
-The exporter does not translate the model into the official Hugging Face Qwen implementation, and it does not modify the learned weights. What it does is the following:
+导出器不会将模型转换为官方 Hugging Face Qwen 实现，也不会修改学到的权重。它做的是以下内容：
 
-1. it builds a custom Hugging Face `PretrainedConfig` and `PreTrainedModel` that reproduce the from-scratch `Qwen3Model` architecture
-2. it loads the original `.pth` `state_dict` directly into that custom Hugging Face model without renaming or reshaping the trainable parameters
-3. it saves the result using the standard Hugging Face folder format so `AutoConfig`, `AutoTokenizer`, `AutoModelForCausalLM`, `generate(...)`, and `Trainer` can load it
+1. 构建一个自定义的 Hugging Face `PretrainedConfig` 和 `PreTrainedModel`，复现从零实现的 `Qwen3Model` 架构
+2. 将原始 `.pth` 的 `state_dict` 直接加载到该自定义 Hugging Face 模型中，不重命名或重塑可训练参数
+3. 使用标准 Hugging Face 文件夹格式保存结果，以便 `AutoConfig`、`AutoTokenizer`、`AutoModelForCausalLM`、`generate(...)` 和 `Trainer` 可以加载它
 
-The main things that are added or wrapped are:
+添加或包装的主要内容是：
 
-- a Hugging Face config file (`config.json`)
-- a Hugging Face model class with a `forward(...)` signature compatible with `transformers`
-- Hugging Face tokenizer files
-- Hugging Face generation metadata (`generation_config.json`)
-- a custom Python source file that `trust_remote_code=True` loads
+- Hugging Face 配置文件（`config.json`）
+- 具有与 `transformers` 兼容的 `forward(...)` 签名的 Hugging Face 模型类
+- Hugging Face tokenizer 文件
+- Hugging Face 生成元数据（`generation_config.json`）
+- `trust_remote_code=True` 加载的自定义 Python 源文件
 
-There is one small extra detail during export. I.e., the from-scratch checkpoints only save the trainable weights, while the Hugging Face export also bundles the precomputed RoPE `cos` and `sin` buffers so reloading the exported model is numerically consistent.
+导出过程中有一个小的额外细节。即，从零实现的检查点只保存可训练权重，而 Hugging Face 导出还打包了预计算的 RoPE `cos` 和 `sin` 缓冲区，使重新加载导出的模型在数值上保持一致。
 
-For `--tokenizer_kind reasoning`, the exporter also attaches the reasoning chat template to the tokenizer, so inference scripts can automatically wrap prompts in the expected chat format. 
+对于 `--tokenizer_kind reasoning`，导出器还会将推理聊天模板附加到 tokenizer，以便推理脚本可以自动将 prompt 包装为预期的聊天格式。
 
-Because this custom Hugging Face module imports the installed [`reasoning_from_scratch`](../../../reasoning_from_scratch) package, the exported folder is compatible as long as that package is installed in the Python environment.
+因为此自定义 Hugging Face 模块导入了已安装的 [`reasoning_from_scratch`](../../../reasoning_from_scratch) 包，只要该包安装在 Python 环境中，导出的文件夹就是兼容的。
 
 &nbsp;
-## Step 3: Export a saved checkpoint
+## 步骤 3：导出已保存的检查点
 
-The same exporter also works for chapter 8 distillation checkpoints or any other compatible `.pth` file produced by this repo.
+同一导出器也适用于第 8 章蒸馏检查点或本仓库生成的任何其他兼容 `.pth` 文件。
 
-For example, if you trained a chapter 8 checkpoint with the reasoning tokenizer:
+例如，如果你使用推理 tokenizer 训练了第 8 章检查点：
 
 ```bash
 uv run hf_export.py \
@@ -103,16 +103,16 @@ uv run hf_export.py \
   --tokenizer_kind reasoning
 ```
 
-Important notes:
+重要说明：
 
-- Use `--tokenizer_kind reasoning` for chapter 8 distillation checkpoints and other checkpoints trained with the reasoning tokenizer.
-- Use `--tokenizer_kind base` for checkpoints trained with the base tokenizer.
-- If the matching tokenizer JSON is already on disk, you can pass it via `--tokenizer_path` to avoid a download.
+- 对于第 8 章蒸馏检查点和其他使用推理 tokenizer 训练的检查点，使用 `--tokenizer_kind reasoning`。
+- 对于使用基座 tokenizer 训练的检查点，使用 `--tokenizer_kind base`。
+- 如果匹配的 tokenizer JSON 已在磁盘上，可以通过 `--tokenizer_path` 传入以避免下载。
 
 &nbsp;
-## Step 4: Run Hugging Face inference
+## 步骤 4：运行 Hugging Face 推理
 
-After export, run inference with `AutoTokenizer` and `AutoModelForCausalLM`:
+导出后，使用 `AutoTokenizer` 和 `AutoModelForCausalLM` 运行推理：
 
 ```bash
 uv run hf_inference.py \
@@ -120,14 +120,14 @@ uv run hf_inference.py \
   --prompt "If x + 7 = 19, what is x?"
 ```
 
-Internally, the script:
+内部，脚本：
 
-1. loads the exported model with `trust_remote_code=True`
-2. formats the prompt with the same chapter 3 math prompt template
-3. applies the reasoning chat wrapper automatically when the exported model uses the reasoning tokenizer
-4. calls `model.generate(...)`
+1. 使用 `trust_remote_code=True` 加载导出的模型
+2. 使用第 3 章相同的数学 prompt 模板格式化 prompt
+3. 当导出的模型使用推理 tokenizer 时，自动应用推理聊天封装
+4. 调用 `model.generate(...)`
 
-If you prefer the raw Hugging Face API directly, the equivalent pattern is:
+如果你更喜欢直接使用原始 Hugging Face API，等效的模式是：
 
 ```python
 from transformers import AutoConfig, AutoModelForCausalLM, AutoTokenizer
@@ -141,11 +141,11 @@ model = AutoModelForCausalLM.from_pretrained(
 ```
 
 &nbsp;
-## Step 5: Continue training with `Trainer`
+## 步骤 5：使用 `Trainer` 继续训练
 
-You can continue training an exported checkpoint with Hugging Face `Trainer` on the same JSON format used in [`../../04_train_with_distillation`](../../04_train_with_distillation).
+你可以使用 Hugging Face `Trainer` 在 [`../../04_train_with_distillation`](../../04_train_with_distillation) 中使用的相同 JSON 格式上继续训练导出的检查点。
 
-Example:
+示例：
 
 ```bash
 uv run hf_trainer.py \
@@ -158,18 +158,18 @@ uv run hf_trainer.py \
   --save_steps 10
 ```
 
-The script keeps the same answer-only training objective used in the scratch distillation code:
+该脚本保持与从零蒸馏代码相同的仅答案训练目标：
 
-- prompt tokens are masked out of the loss
-- only the distilled answer tokens contribute to the cross-entropy loss
-- for reasoning exports, the script wraps teacher traces as `<think>...</think>` before the final answer
+- prompt token 从损失中被掩码
+- 只有蒸馏答案 token 参与交叉熵损失计算
+- 对于推理导出，脚本在最终答案前将教师轨迹包装为 `<think>...</think>`
 
 
 
 &nbsp;
-## Loading the export elsewhere
+## 在其他地方加载导出的模型
 
-Once exported, you can copy the folder to another machine or upload it to the Hugging Face Hub and load it there too, as long as `reasoning_from_scratch` is installed in that environment:
+导出后，你可以将文件夹复制到另一台机器或上传到 Hugging Face Hub 并在那里加载，只要该环境中安装了 `reasoning_from_scratch`：
 
 ```python
 from transformers import AutoModelForCausalLM, AutoTokenizer

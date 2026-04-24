@@ -1,50 +1,50 @@
 
-# MMLU Benchmarking
+# MMLU 基准评测
 
-This bonus material implements three different methods for evaluating models on MMLU. 
-- Method 1 is meant as an intuitive introduction
-- Method 2 is the most widely used method in practice
-- Method 3 is a more robust method that is better suited for reasoning models
+此附加材料实现了在 MMLU 上评估模型的三种不同方法。
+- 方法 1 旨在作为直觉性介绍
+- 方法 2 是实践中最广泛使用的方法
+- 方法 3 是一种更稳健的方法，更适合推理模型
 
-- Please note that the code loads the [MMLU dataset](https://huggingface.co/datasets/cais/mmlu) from the Hugging Face model hub. So, you need to install the `datasets` Python library before running the code:
+- 请注意，代码从 Hugging Face 模型中心加载 [MMLU 数据集](https://huggingface.co/datasets/cais/mmlu)。因此，在运行代码之前需要安装 `datasets` Python 库：
 
 ```python
 pip install datasets
 ```
 
-or
+或
 
 ```python
 uv add datasets
 ```
 
-- In the following sections, we apply the MMLU evaluation methods to  (`"high_school_mathematics"`)
+- 在以下章节中，我们将 MMLU 评估方法应用于 (`"high_school_mathematics"`)
 
-- Note that there are many other interesting subsets; this one is chosen for simplicity and efficiency; you can use, for example
+- 注意还有许多其他有趣的子集；选择这个是为了简单和高效；你可以使用，例如：
 
-  - Use `--subsets list` to list other available subsets 
+  - 使用 `--subsets list` 列出其他可用子集
 
-  - Use, for example, `--subsets "astronomy,high_school_mathematics"` to select multiple subsets
+  - 使用 `--subsets "astronomy,high_school_mathematics"` 选择多个子集
 
-  - Use `--subsets "all"` to evaluate on all subsets
+  - 使用 `--subsets "all"` 在所有子集上评估
 
-(Not that for simplicity and code readability, we focus on a zero-shot, as opposed to a 5-shot, setting.)
+（注意为了简单和代码可读性，我们专注于 zero-shot 而非 5-shot 设置。）
 
 <br>
 
 ---
 
-**Note**: If you are not a `uv` user, replace `uv run ...py` with `python ...py` in the examples below.
+**注意**：如果你不是 `uv` 用户，请在下面的示例中将 `uv run ...py` 替换为 `python ...py`。
 
 ---
 
 &nbsp;
 
-## Method 1: MMLU letter matching
+## 方法 1：MMLU 字母匹配
 
-- We let the model generate the answer
-- We extract the first generated A/B/C/D letter and compare it to the correct answer
-- This is the most intuitive method, but the downside is that the model may not respond with a letter A/B/C/D
+- 我们让模型生成答案
+- 我们提取第一个生成的 A/B/C/D 字母，并与正确答案进行比较
+- 这是最直觉的方法，但缺点是模型可能不会以字母 A/B/C/D 回应
 
 <br>
 
@@ -88,11 +88,11 @@ MMLU letter accuracy: 57/270 = 21.11% in 43.6s
 
 &nbsp;
 
-## Method 2: Log-probability scoring
+## 方法 2：Log-probability 评分
 
-- We run the prompt through the model and get log-probabilities (log-probs) for the next token (see chapter 4 for log-probs discussion)
-- For each letter choice, we then compute which token ID would appear first if we appended that letter
-- Then, we compare those four log-probs and pick the highest one (max)
+- 我们将 prompt 通过模型运行并获取下一个 token 的 log-probabilities（log-probs）（关于 log-probs 的讨论见第 4 章）
+- 对于每个字母选项，我们计算如果附加该字母会首先出现哪个 token ID
+- 然后，我们比较这四个 log-probs 并选择最高的那个（max）
 
 <br>
 
@@ -136,12 +136,12 @@ MMLU letter accuracy (log-prob): 57/270 = 21.11% in 22.4s
 
 &nbsp;
 
-## Method 3: Teacher forcing
+## 方法 3：Teacher forcing
 
-- Instead of looking up the log-prob of each of the letters A/B/C/D, a more robust scoring (specifically for reasoning models), is to feed the letter along with the complete answer string
-- For our example, the answer strings are "A. 7", "B. 11", "C. 16", "D. 8"
-- This method is known by the unfortunate term "teacher forcing"
-- This method is the most reliable, but the caveat is that it takes 4x longer than the log-probability approach in method 2 (since we feed the model all 4 answer variants)
+- 与查找每个字母 A/B/C/D 的 log-prob 不同，一种更稳健的评分方法（特别是对于推理模型）是将字母连同完整的答案字符串一起输入
+- 对于我们的示例，答案字符串是 "A. 7"、"B. 11"、"C. 16"、"D. 8"
+- 这种方法有一个不太恰当的名称叫 "teacher forcing"
+- 这种方法最可靠，但注意它比方法 2 中的 log-probability 方法慢 4 倍（因为我们将所有 4 个答案变体都输入模型）
 
 <br>
 
@@ -183,53 +183,53 @@ MMLU letter accuracy (teacher-forced): 78/270 = 28.89% in 68.8s
 
 
 
-## Random guessing baseline
+## 随机猜测基线
 
-- This random guessing baseline is just to put the numbers above into perspective
+- 此随机猜测基线只是为了将上面的数字放入适当的背景中
   
-- A model that guesses randomly with uniform (equal) probability across all answers is expected to achieve $25\%$ accuracy
+- 一个以均匀（等概率）分布在所有答案上随机猜测的模型，预期准确率为 $25\%$
   
-- However, for a random guesser, we can expect deviations from the $25\%$ (depending on the sample size)
+- 但是，对于随机猜测者，我们可以预期偏离 $25\%$（取决于样本大小）
 
-- For instance, we can model one evaluation run as a binomial with $K$ correct out of $n$ questions:
+- 例如，我们可以将一次评估运行建模为 $n$ 个问题中答对 $K$ 个的二项分布：
 
-  - $K \sim \mathrm{Binomial}(n,p)$ with $p=\tfrac14$ and $n=$ number of questions.  
-  - Accuracy $A = K/n$.
+  - $K \sim \mathrm{Binomial}(n,p)$，其中 $p=\tfrac14$，$n=$ 问题数量。  
+  - 准确率 $A = K/n$。
 
-- Let's walk through this for the *high_school_mathematics* subset with $n=270$
+- 让我们以 $n=270$ 的 *high_school_mathematics* 子集为例来分析
 
-- In general, the properties of the binomial are:
+- 一般来说，二项分布的性质为：
 
-  - Mean: $\mathbb{E}[K] = np$
-  - SD: $\sigma_K = \sqrt{np(1-p)}$
+  - 均值：$\mathbb{E}[K] = np$
+  - 标准差：$\sigma_K = \sqrt{np(1-p)}$
 
-- For accuracy $A=K/n$:
+- 对于准确率 $A=K/n$：
 
-  - Mean: $\mathbb{E}[A] = p = 0.25$
-  - SD: $\sigma_A = \sqrt{\tfrac{p(1-p)}{n}}$
+  - 均值：$\mathbb{E}[A] = p = 0.25$
+  - 标准差：$\sigma_A = \sqrt{\tfrac{p(1-p)}{n}}$
 
-- Plugging in $n=270$:
+- 代入 $n=270$：
 
   - $\mathbb{E}[A] = 25\%$  
   - $\sigma_A = \sqrt{\tfrac{0.25\cdot 0.75}{270}} \approx 2.64\%$
 
-- Convert the one standard deviation ($\pm 1\sigma$) accuracy bounds to counts:
+- 将一个标准差（$\pm 1\sigma$）的准确率界限转换为计数：
 
-  - Lower: $K \le \lfloor 270\,(0.25-0.02636)\rfloor = 60$
-  - Upper: $K \ge \lceil 270\,(0.25+0.02636)\rceil = 75$
-  - (Inside the band is $K=61,\dots,74$; equivalently $A\in[22.36\%,\,27.64\%]$)
+  - 下界：$K \le \lfloor 270\,(0.25-0.02636)\rfloor = 60$
+  - 上界：$K \ge \lceil 270\,(0.25+0.02636)\rceil = 75$
+  - （落在范围内的是 $K=61,\dots,74$；等价地 $A\in[22.36\%,\,27.64\%]$）
 
-- So, the probability of falling outside this bound is:
+- 因此，落在此界限之外的概率为：
 
   $$
   z = \pm\,\frac{75-67.5}{\sqrt{270\cdot 0.25\cdot 0.75}} \approx \pm 1.054, \qquad
   \Pr(|A-0.25|>0.02636) \approx 2\bigl(1-\Phi(1.054)\bigr) \approx 0.292.
   $$
 
-  So about 29.2% of random-guess runs are below 22.36% or above 27.64%
+  所以约 29.2% 的随机猜测运行低于 22.36% 或高于 27.64%
 
-- This means in about $29.2\%$ of cases where the model is random guessing (assuming uniformly), we get an accuracy below $22.36\%$ or above $27.64\%$
-- Below is an empirical look:
+- 这意味着在大约 $29.2\%$ 的模型随机猜测（假设均匀分布）的情况下，我们得到的准确率低于 $22.36\%$ 或高于 $27.64\%$
+- 以下是经验观察：
 
 
 ```bash

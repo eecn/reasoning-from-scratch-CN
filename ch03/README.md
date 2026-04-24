@@ -1,12 +1,12 @@
-# Chapter 3: Evaluating Reasoning Models
+# 第 3 章：评估推理模型
 
 &nbsp;
-## Main chapter code
+## 主要章节代码
 
-- [01_main-chapter-code](01_main-chapter-code): main chapter code and exercise solutions
+- [01_main-chapter-code](01_main-chapter-code)：主要章节代码和练习题解答
 
 &nbsp;
-## Bonus material
+## 附加材料
 
-- [02_math500-verifier-scripts](02_math500-verifier-scripts): optional Python scripts to run the MATH-500 evaluation from the command line, including a batched version with higher throughput
-- [03_advanced-parser](03_advanced-parser): a sophisticated hybrid LaTeX parser, plus a notebook comparing it against the current parser on selected examples
+- [02_math500-verifier-scripts](02_math500-verifier-scripts)：可选的 Python 脚本，用于从命令行运行 MATH-500 评估，包括具有更高吞吐量的批处理版本
+- [03_advanced-parser](03_advanced-parser)：复杂的混合 LaTeX 解析器，以及一个在选定示例上与当前解析器进行比较的 notebook

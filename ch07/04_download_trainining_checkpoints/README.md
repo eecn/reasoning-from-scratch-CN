@@ -1,31 +1,31 @@
-# Downloading and Using Training Checkpoints
+# 下载和使用训练检查点
 
-This folder explains how to download and use the chapter 7 training checkpoints from Hugging Face at [https://huggingface.co/rasbt/qwen3-from-scratch-grpo-checkpoints](https://huggingface.co/rasbt/qwen3-from-scratch-grpo-checkpoints).
+此文件夹说明了如何从 Hugging Face 的 [https://huggingface.co/rasbt/qwen3-from-scratch-grpo-checkpoints](https://huggingface.co/rasbt/qwen3-from-scratch-grpo-checkpoints) 下载和使用第 7 章的训练检查点。
 
-The checkpoints are plain PyTorch `state_dict` files for the `reasoning_from_scratch` package. They are not Hugging Face Transformers checkpoints.
+这些检查点是 `reasoning_from_scratch` 包的纯 PyTorch `state_dict` 文件，不是 Hugging Face Transformers 检查点。
 
 ---
 
-**Note**: If you are not a `uv` user, replace `uv run ...py` with `python ...py` in the examples below.
+**注意**：如果你不是 `uv` 用户，请在下面的示例中将 `uv run ...py` 替换为 `python ...py`。
 
 ---
 
 &nbsp;
-## Available Checkpoint Folders
+## 可用的检查点文件夹
 
-- `7_3_plus_tracking`: GRPO checkpoints with additional metric tracking
-- `7_4_plus_clip_ratio`: GRPO checkpoints with clipped policy ratios
-- `7_5_plus_kl`: GRPO checkpoints with a KL term
-- `7_6_plus_format_reward`: GRPO checkpoints with an explicit format reward for `<think>` tags
+- `7_3_plus_tracking`：带额外指标跟踪的 GRPO 检查点
+- `7_4_plus_clip_ratio`：带裁剪策略比率的 GRPO 检查点
+- `7_5_plus_kl`：带 KL 项的 GRPO 检查点
+- `7_6_plus_format_reward`：带 `<think>` 标签显式格式奖励的 GRPO 检查点
 
-The checkpoints are hosted in:
+检查点托管在：
 
 - [rasbt/qwen3-from-scratch-grpo-checkpoints](https://huggingface.co/rasbt/qwen3-from-scratch-grpo-checkpoints)
 
 &nbsp;
-## Downloading a Checkpoint
+## 下载检查点
 
-Use `download_qwen3_grpo_checkpoints(...)` from [`reasoning_from_scratch.qwen3`](https://github.com/rasbt/reasoning-from-scratch/blob/main/reasoning_from_scratch/qwen3.py):
+使用 [`reasoning_from_scratch.qwen3`](https://github.com/rasbt/reasoning-from-scratch/blob/main/reasoning_from_scratch/qwen3.py) 中的 `download_qwen3_grpo_checkpoints(...)`：
 
 ```python
 from reasoning_from_scratch.qwen3 import download_qwen3_grpo_checkpoints
@@ -38,24 +38,24 @@ checkpoint_path = download_qwen3_grpo_checkpoints(
 ```
 
 &nbsp;
-## Which Tokenizer to Use
+## 使用哪个 Tokenizer
 
-Use the base tokenizer for:
+对以下检查点使用基座 tokenizer：
 
 - `7_3_plus_tracking`
 - `7_4_plus_clip_ratio`
 - `7_5_plus_kl`
 
-Use the reasoning tokenizer for:
+对以下检查点使用推理 tokenizer：
 
 - `7_6_plus_format_reward`
 
-The reason is that `7_6_plus_format_reward` was trained from the reasoning model and expects the reasoning chat formatting.
+原因是 `7_6_plus_format_reward` 是从推理模型训练的，需要推理聊天格式。
 
 &nbsp;
-## Usage Example
+## 使用示例
 
-The example below downloads a checkpoint, downloads the matching tokenizer, loads the model, and generates text with `generate_text_basic_stream_cache` from chapter 2:
+以下示例下载检查点、下载匹配的 tokenizer、加载模型，并使用第 2 章的 `generate_text_basic_stream_cache` 生成文本：
 
 ```python
 from pathlib import Path
@@ -105,9 +105,9 @@ for token in generate_text_basic_stream_cache(
 ```
 
 &nbsp;
-## Format-Reward Example
+## 格式奖励示例
 
-For `7_6_plus_format_reward`, switch to the reasoning tokenizer:
+对于 `7_6_plus_format_reward`，切换到推理 tokenizer：
 
 ```python
 from pathlib import Path
@@ -129,9 +129,9 @@ tokenizer = Qwen3Tokenizer(
 ```
 
 &nbsp;
-## Chapter 6 Example
+## 第 6 章示例
 
-The same helper also supports the original chapter 6 no-KL checkpoint:
+同一辅助函数也支持第 6 章的原始无 KL 检查点：
 
 ```python
 from reasoning_from_scratch.qwen3 import download_qwen3_grpo_checkpoints
@@ -140,20 +140,20 @@ download_qwen3_grpo_checkpoints(grpo_type="no_kl", step="00050", out_dir="qwen3"
 ```
 
 &nbsp;
-## Available Checkpoints
+## 可用检查点
 
-Section mapping:
+章节对应关系：
 
-- `no_kl`: chapter 6 baseline from the original no-KL GRPO setup
-- `tracking`: section 7.3 in the main chapter
-- `clip_ratio`: section 7.4 in the main chapter
-- `kl`: section 7.5 in the main chapter
-- `format_reward`: section 7.6 in the main chapter
+- `no_kl`：第 6 章的原始无 KL GRPO 设置基线
+- `tracking`：主章节的 7.3 节
+- `clip_ratio`：主章节的 7.4 节
+- `kl`：主章节的 7.5 节
+- `format_reward`：主章节的 7.6 节
 
-Available saved steps:
+可用的已保存步骤：
 
-- `no_kl`: `00050`, `00100`, `00500`, `01000`, `01500`, `03000`, `05000`, `09000`
-- `tracking`: `00050`, `00100`, `00150`, `00200`, `00250`, `00300`, `00350`, `00400`, `00450`, `00500`
-- `clip_ratio`: `00050`, `00100`, `00150`, `00200`, `00250`, `00300`, `00350`, `00400`, `00450`, `00500`
-- `kl`: `00050`, `00100`, `00150`, `00200`, `00250`, `00300`, `00350`, `00400`, `00450`, `00500`
-- `format_reward`: `00050`, `00100`, `00150`, `00200`, `00250`, `00300`, `00350`, `00400`, `00450`, `00500`
+- `no_kl`：`00050`、`00100`、`00500`、`01000`、`01500`、`03000`、`05000`、`09000`
+- `tracking`：`00050`、`00100`、`00150`、`00200`、`00250`、`00300`、`00350`、`00400`、`00450`、`00500`
+- `clip_ratio`：`00050`、`00100`、`00150`、`00200`、`00250`、`00300`、`00350`、`00400`、`00450`、`00500`
+- `kl`：`00050`、`00100`、`00150`、`00200`、`00250`、`00300`、`00350`、`00400`、`00450`、`00500`
+- `format_reward`：`00050`、`00100`、`00150`、`00200`、`00250`、`00300`、`00350`、`00400`、`00450`、`00500`

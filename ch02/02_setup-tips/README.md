@@ -1,9 +1,9 @@
-# Chapter 2: Generating Text with a Pre-Trained LLM
+# 第 2 章：使用预训练 LLM 生成文本
 
 
 &nbsp;
 
-## Bonus material
+## 附加材料
 
-- [python-instructions.md](python-instructions.md): optional Python setup recommendations and instructions
-- [gpu-instructions.md](gpu-instructions.md): recommendations for cloud compute resources
+- [python-instructions.md](python-instructions.md)：可选的 Python 设置建议和说明
+- [gpu-instructions.md](gpu-instructions.md)：云计算资源推荐

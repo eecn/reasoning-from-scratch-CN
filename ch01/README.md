@@ -1,8 +1,8 @@
-# Chapter 1: Understanding reasoning models
+# 第 1 章：理解推理模型
 
 
 &nbsp;
-## Main chapter code
+## 主要章节代码
 
-There is no code in this chapter.
+本章无代码。
 

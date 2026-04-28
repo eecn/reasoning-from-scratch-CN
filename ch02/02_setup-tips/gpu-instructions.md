@@ -1,17 +1,17 @@
 
-# GPU Cloud Resources
+# GPU 云资源
 
-This section describes cloud alternatives for running the code presented in this book.
+本节介绍运行本书代码的云端替代方案。
 
-While the code can run on conventional laptops and desktop computers without a dedicated GPU, cloud platforms with NVIDIA GPUs can substantially improve the runtime of the code, especially in chapters 5 to 7.
+虽然代码可以在没有独立 GPU 的普通笔记本电脑和台式机上运行，但配备 NVIDIA GPU 的云平台可以显著改善代码的运行时间，特别是在第 5 至第 7 章。
 
 &nbsp;
 
-## Using Lightning Studio
+## 使用 Lightning Studio
 
-For a smooth development experience in the cloud, I recommend the [Lightning AI Studio](https://lightning.ai/) platform, which allows users to set up a persistent environment and use both VSCode and Jupyter Lab on cloud CPUs and GPUs.
+为了在云端获得流畅的开发体验，我推荐 [Lightning AI Studio](https://lightning.ai/) 平台，它允许用户设置持久化环境，并在云端 CPU 和 GPU 上使用 VSCode 和 Jupyter Lab。
 
-Once you start a new Studio, you can open the terminal and execute the following setup steps to clone the repository and install the dependencies:
+开启一个新的 Studio 后，你可以打开终端并执行以下设置步骤来克隆仓库和安装依赖：
 
 ```bash
 git clone https://github.com/rasbt/reasoning-from-scratch.git
@@ -19,32 +19,32 @@ cd reasoning-from-scratch
 pip install -r requirements.txt
 ```
 
-(In contrast to Google Colab, these only need to be executed once since the Lightning AI Studio environments are persistent, even if you switch between CPU and GPU machines.)
+（与 Google Colab 不同，这些步骤只需执行一次，因为 Lightning AI Studio 环境是持久化的，即使你在 CPU 和 GPU 机器之间切换也是如此。）
 
-Then, navigate to the Python script or Jupyter Notebook you want to run. Optionally, you can also easily connect a GPU to accelerate the code's runtime, for example, when you are pretraining the LLM in chapter 5 or finetuning it in chapters 6 and 7.
+然后，导航到你想运行的 Python 脚本或 Jupyter Notebook。你也可以选择连接 GPU 来加速代码运行，例如在第 5 章预训练 LLM 或在第 6 和第 7 章微调时。
 
-<img src="https://sebastianraschka.com/images/LLMs-from-scratch-images/setup/README/studio.webp" alt="1" width="700">
-
-&nbsp;
-
-## Using Google Colab
-
-To use a Google Colab environment in the cloud, head over to [https://colab.research.google.com/](https://colab.research.google.com/) and open the respective chapter notebook from the GitHub menu or by dragging the notebook into the *Upload* field as shown in the figure below.
-
-<img src="https://sebastianraschka.com/images/LLMs-from-scratch-images/setup/README/colab_1.webp" alt="1" width="700">
-
-
-Also make sure you upload the relevant files (dataset files and .py files the notebook is importing from) to the Colab environment as well, as shown below.
-
-<img src="https://sebastianraschka.com/images/LLMs-from-scratch-images/setup/README/colab_2.webp" alt="2" width="700">
-
-
-You can optionally run the code on a GPU by changing the *Runtime* as illustrated in the figure below.
-
-<img src="https://sebastianraschka.com/images/LLMs-from-scratch-images/setup/README/colab_3.webp" alt="3" width="700">
-
+<img src="https://sebastianraschka.com/images/LLMs-from-scratch-images/setup/README/studio.webp" alt="Lightning Studio 界面" width="700">
 
 &nbsp;
-## Questions?
 
-If you have any questions, please don't hesitate to reach out via the [Discussions](https://github.com/rasbt/reasoning-from-scratch/discussions) forum in this GitHub repository.
+## 使用 Google Colab
+
+要使用云端的 Google Colab 环境，请前往 [https://colab.research.google.com/](https://colab.research.google.com/)，通过 GitHub 菜单打开对应章节的 notebook，或将 notebook 拖入 *Upload* 区域，如下图所示。
+
+<img src="https://sebastianraschka.com/images/LLMs-from-scratch-images/setup/README/colab_1.webp" alt="Colab 上传界面" width="700">
+
+
+还要确保将相关文件（数据集文件和 notebook 导入的 .py 文件）也上传到 Colab 环境中，如下图所示。
+
+<img src="https://sebastianraschka.com/images/LLMs-from-scratch-images/setup/README/colab_2.webp" alt="Colab 文件上传" width="700">
+
+
+你可以通过更改 *Runtime* 来选择在 GPU 上运行代码，如下图所示。
+
+<img src="https://sebastianraschka.com/images/LLMs-from-scratch-images/setup/README/colab_3.webp" alt="Colab GPU 设置" width="700">
+
+
+&nbsp;
+## 有问题？
+
+如果你有任何问题，请随时通过本 GitHub 仓库的 [Discussions](https://github.com/rasbt/reasoning-from-scratch/discussions) 论坛联系我们。

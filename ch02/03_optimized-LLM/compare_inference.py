@@ -22,7 +22,7 @@ from reasoning_from_scratch.qwen3 import (
 ############################
 # Parse command-line args
 ############################
-parser = argparse.ArgumentParser(description="Run Qwen3 text generation")
+parser = argparse.ArgumentParser(formatter_class=argparse.ArgumentDefaultsHelpFormatter, description="Run Qwen3 text generation")
 parser.add_argument(
     "--device",
     type=str,
@@ -33,13 +33,13 @@ parser.add_argument(
 parser.add_argument(
     "--cache",
     action="store_true",
-    help="Use KV cache during generation (default: False)."
+    help="Use KV cache during generation."
 )
 
 parser.add_argument(
     "--compile",
     action="store_true",
-    help="Compile PyTorch model (default: False)."
+    help="Compile PyTorch model."
 )
 
 parser.add_argument(
@@ -65,12 +65,15 @@ else:
 
 if args.cache:
     if args.optimized:
-        from reasoning_from_scratch.qwen3_optimized import generate_text_basic_cache as generate_text_basic
+        from reasoning_from_scratch.qwen3_optimized import generate_text_basic_cache as generate_text
+        is_streaming_generate = False
     else:
-        from reasoning_from_scratch.ch02 import generate_text_basic_cache as generate_text_basic
+        from reasoning_from_scratch.ch02 import generate_text_basic_stream_cache as generate_text
+        is_streaming_generate = True
 
 else:
-    from reasoning_from_scratch.ch02 import generate_text_basic
+    from reasoning_from_scratch.ch02 import generate_text_basic_stream as generate_text
+    is_streaming_generate = True
 
 device = torch.device(args.device) if args.device else get_device()
 
@@ -80,10 +83,10 @@ device = torch.device(args.device) if args.device else get_device()
 
 if args.reasoning:
     download_qwen3_small(kind="reasoning", tokenizer_only=False, out_dir="qwen3")
-    tokenizer_file_path = Path("qwen3") / "tokenizer-reasoning.json"
-    model_file = Path("qwen3") / "qwen3-0.6B-reasoning.pth"
+    tokenizer_path = Path("qwen3") / "tokenizer-reasoning.json"
+    model_path = Path("qwen3") / "qwen3-0.6B-reasoning.pth"
     tokenizer = Qwen3Tokenizer(
-        tokenizer_file_path=tokenizer_file_path,
+        tokenizer_file_path=tokenizer_path,
         apply_chat_template=True,
         add_generation_prompt=True,
         add_thinking=True
@@ -91,16 +94,22 @@ if args.reasoning:
 
 else:
     download_qwen3_small(kind="base", tokenizer_only=False, out_dir="qwen3")
-    tokenizer_file_path = Path("qwen3") / "tokenizer-base.json"
-    model_file = Path("qwen3") / "qwen3-0.6B-base.pth"
-    tokenizer = Qwen3Tokenizer(tokenizer_file_path=tokenizer_file_path)
+    tokenizer_path = Path("qwen3") / "tokenizer-base.json"
+    model_path = Path("qwen3") / "qwen3-0.6B-base.pth"
+    tokenizer = Qwen3Tokenizer(tokenizer_file_path=tokenizer_path)
 
 model = Qwen3Model(QWEN_CONFIG_06_B)
-model.load_state_dict(torch.load(model_file, map_location=device))
+model.load_state_dict(torch.load(model_path, map_location=device))
 
 model.to(device)
 
 if args.compile:
+    major, minor = map(int, torch.__version__.split(".")[:2])
+    if (major, minor) >= (2, 8):
+        # This avoids retriggering model recompilations
+        # in PyTorch 2.8 and newer
+        # if the model contains code like self.pos = self.pos + 1
+        torch._dynamo.config.allow_unspec_int_on_nn_module = True
     model = torch.compile(model)
 
 #########################
@@ -132,12 +141,23 @@ for iteration in range(1, 4):
     print("=" * 60)
 
     start_time = time.time()
-    output_token_ids_tensor = generate_text_basic(
-        model=model,
-        token_ids=input_token_ids_tensor,
-        max_new_tokens=max_new_tokens,
-        eos_token_id=tokenizer.eos_token_id,
-    )
+    if is_streaming_generate:
+        generated_ids = []
+        for token in generate_text(
+            model=model,
+            token_ids=input_token_ids_tensor,
+            max_new_tokens=max_new_tokens,
+            eos_token_id=tokenizer.eos_token_id,
+        ):
+            generated_ids.append(token.squeeze(0).item())
+        output_token_ids_tensor = torch.tensor(generated_ids, device=device)
+    else:
+        output_token_ids_tensor = generate_text(
+            model=model,
+            token_ids=input_token_ids_tensor,
+            max_new_tokens=max_new_tokens,
+            eos_token_id=tokenizer.eos_token_id,
+        )
     end_time = time.time()
 
     print(f"Output length: {output_token_ids_tensor.numel()}")
